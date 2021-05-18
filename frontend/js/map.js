@@ -1,45 +1,23 @@
 ﻿function initMap() {
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 7,
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 10,
         center: { lat: 41.85, lng: -87.65 },
     });
     directionsRenderer.setMap(map);
-
-    const onChangeHandler = function () {
-        calculateAndDisplayRoute(directionsService, directionsRenderer);
-    };
-    document.getElementById("start").addEventListener("change", onChangeHandler);
-    document.getElementById("end").addEventListener("change", onChangeHandler);
-}
-
-function calculateAndDisplayRoute(directionsService, directionsRenderer, originPos) {
-    directionsService.route(
-        {
-            origin: originPos,
-            destination: {
-                query: document.getElementById("end").value,
-            },
-            travelMode: google.maps.TravelMode.DRIVING,
-        },
-        (response, status) => {
-            if (status === "OK") {
-                directionsRenderer.setDirections(response);
-            } else {
-                window.alert("Directions request failed due to " + status);
-            }
-        }
-    );
-}
-
-function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 6,
-    });
     infoWindow = new google.maps.InfoWindow();
-    window.onload(AskForLocation());
+    AskForLocation();
+
+    const geocoder = new google.maps.Geocoder();
+    document.getElementById("submit").addEventListener("click", () => {
+        geocodeAddress(geocoder, map, startPosition);
+    });
+}
+
+function setStart(startingPosition)
+{
+    startPosition = startingPosition;
 }
 
 function AskForLocation()
@@ -53,10 +31,18 @@ function AskForLocation()
                         lng: position.coords.longitude,
                     };
                     originPos = pos;
-                    infoWindow.setPosition(pos);
-                    infoWindow.setContent("Location found.");
-                    infoWindow.open(map);
+                    //infoWindow.setPosition(pos);
+                    //infoWindow.setContent("Location found");
+                    //infoWindow.open(map);
                     map.setCenter(pos);
+
+                    marker = new google.maps.Marker({
+                        position: originPos,
+                        map: map,
+                        title: "Hello world!",
+                    });
+                    var startCoords = {lat: position.coords["latitude"], long: position.coords["longitude"]};
+                    setStart(startCoords);
                 },
                 () => {
                     handleLocationError(true, infoWindow, map.getCenter());
@@ -76,4 +62,47 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
             : "Error: Your browser doesn't support geolocation."
     );
     infoWindow.open(map);
+    console.log("Handle location error called");
+}
+
+function geocodeAddress(geocoder, resultsMap, startPosition) {
+    const address = document.getElementById("address").value;
+    geocoder.geocode({ address: address }, (results, status) => {
+        if (status === "OK") {
+            resultsMap.setCenter(results[0].geometry.location);
+            markerDestination = new google.maps.Marker({
+                    map: resultsMap,
+                    position: results[0].geometry.location,
+            });
+            
+            calculateAndDisplayRoute(startPosition, results[0].geometry.location);
+
+        } else {
+            alert("Geocode was not successful for the following reason: " + status);
+        }
+    });
+}
+
+function calculateAndDisplayRoute(origin, destination) {
+    console.log(origin);
+    console.log(destination);
+    directionsService.route(
+    {
+      origin: {lat: origin.lat, lng: origin.long},
+      destination: destination,
+      // Note that Javascript allows us to access the constant
+      // using square brackets and a string value as its
+      // "property."
+      travelMode: google.maps.TravelMode["DRIVING"],
+    },
+    (response, status) => {
+      if (status == "OK") {
+        directionsRenderer.setDirections(response);
+        console.log(response.routes[0].legs[0].distance);
+        console.log(response.routes[0].legs[0].duration);
+      } else {
+        window.alert("Directions request failed due to " + status);
+      }
+    }
+  );
 }

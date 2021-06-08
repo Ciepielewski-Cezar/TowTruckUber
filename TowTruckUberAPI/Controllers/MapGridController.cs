@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using TowTruckUberAPI.Models;
 using TowTruckUberAPI.Models.Dtos;
@@ -13,6 +14,7 @@ namespace TowTruckUberAPI.Controllers
 {
     [Route("mapgrid")]
     [ApiController]
+    [AllowAnonymous]
     public class MapGridController : Controller
     {
         private readonly AppDbContext _dbContext;

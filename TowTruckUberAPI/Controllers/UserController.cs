@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,38 +55,49 @@ namespace TowTruckUberAPI.Controllers
                 Longitude = "17.037754"
             };
 
-            User user = new User()
-            {
-                Name = "Maciek",
-                Surname = "Nowak",
-                PhoneNumber = "123456789",
-                Email = "mail@gmail.com",
-                UserName = "macko",
-                UserLocation = new List<MapGrid>() { mapGrid },
-                SecurityStamp = Guid.NewGuid().ToString(),
-            };
-            string password = "P@ssw0rd";
-            var result = await _userManager.CreateAsync(user, password);
-
             return JsonSerializer.Serialize(mapGrid); ;
         }
 
         //[AllowAnonymous]
         [HttpGet]
         [Route("contractors")]
-        public async Task<IActionResult> GetContractors()
+        public async Task<string> GetContractors()
         {
-            var user = await _userManager.FindByNameAsync("Maciek");
+            MapGrid mapGrid = new MapGrid()
+            {
+                Latitude = "51.113843",
+                Longitude = "17.037754"
+            };
 
+            var findContractor = await _userManager.FindByEmailAsync("mail@gmail.com");
+
+            if (findContractor is null)
+            {
+                User contractor = new User()
+                {
+                    Name = "Maciek",
+                    Surname = "Nowak",
+                    PhoneNumber = "123456789",
+                    Email = "mail@gmail.com",
+                    UserName = "macko",
+                    UserLocation = new List<MapGrid>() {mapGrid},
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                };
+                string password = "P@ssw0rd";
+                var result = await _userManager.CreateAsync(contractor, password);
+            }
+
+            var user = await _userManager.FindByEmailAsync("mail@gmail.com");
             UserDto userDto = new UserDto()
             {
                 Name = user.Name,
                 Surname = user.Surname,
                 Username = user.UserName,
-
+                Longitude = user.UserLocation.First().Longitude,
+                Latitude = user.UserLocation.First().Latitude
             };
 
-            return Ok();
+            return JsonSerializer.Serialize(userDto);
         }
 
         [AllowAnonymous]

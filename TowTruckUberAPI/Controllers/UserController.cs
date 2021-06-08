@@ -69,9 +69,9 @@ namespace TowTruckUberAPI.Controllers
                 Longitude = "17.037754"
             };
 
-            var findContractor = await _userManager.FindByEmailAsync("mail@gmail.com");
-
-            if (findContractor is null)
+            var user = await _userManager.FindByEmailAsync("mail@gmail.com");
+            
+            if (user is null)
             {
                 User contractor = new User()
                 {
@@ -80,14 +80,17 @@ namespace TowTruckUberAPI.Controllers
                     PhoneNumber = "123456789",
                     Email = "mail@gmail.com",
                     UserName = "macko",
-                    UserLocation = new List<MapGrid>() {mapGrid},
+                    UserLocation = new List<MapGrid>() { mapGrid },
                     SecurityStamp = Guid.NewGuid().ToString(),
                 };
                 string password = "P@ssw0rd";
                 var result = await _userManager.CreateAsync(contractor, password);
             }
 
-            var user = await _userManager.FindByEmailAsync("mail@gmail.com");
+            user.UserLocation = new List<MapGrid>();
+            user.UserLocation.Add(mapGrid);
+            await _dbContext.SaveChangesAsync();
+           
             UserDto userDto = new UserDto()
             {
                 Name = user.Name,
@@ -96,8 +99,8 @@ namespace TowTruckUberAPI.Controllers
                 Longitude = user.UserLocation.First().Longitude,
                 Latitude = user.UserLocation.First().Latitude
             };
-
             return JsonSerializer.Serialize(userDto);
+
         }
 
         [AllowAnonymous]

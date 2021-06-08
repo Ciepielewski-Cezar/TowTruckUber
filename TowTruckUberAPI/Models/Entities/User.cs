@@ -21,6 +21,7 @@ namespace TowTruckUberAPI.Models
 
         public bool IsContractor { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public ICollection<MapGrid> UserLocation { get; set; }
 
         public ICollection<Trip> CustomerTrips { get; set; }
         public ICollection<Trip> ContractorTrips { get; set; }

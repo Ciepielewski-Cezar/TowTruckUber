@@ -43,19 +43,49 @@ namespace TowTruckUberAPI.Controllers
             _logger = logger;
         }
 
-
+        [AllowAnonymous]
         [HttpGet]
         [Route("login")]
-        public string Login()
+        public async Task<string> Login()
         {
             MapGrid mapGrid = new MapGrid()
             {
-                Id = 3,
-                Latitude = "3535.353",
-                Longitude = "-493.434"
+                Latitude = "51.113843",
+                Longitude = "17.037754"
             };
 
+            User user = new User()
+            {
+                Name = "Maciek",
+                Surname = "Nowak",
+                PhoneNumber = "123456789",
+                Email = "mail@gmail.com",
+                UserName = "macko",
+                UserLocation = new List<MapGrid>() { mapGrid },
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            string password = "P@ssw0rd";
+            var result = await _userManager.CreateAsync(user, password);
+
             return JsonSerializer.Serialize(mapGrid); ;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("contractors")]
+        public async Task<IActionResult> GetContractors()
+        {
+            var user = await _userManager.FindByNameAsync("Maciek");
+
+            UserDto userDto = new UserDto()
+            {
+                Name = user.Name,
+                Surname = user.Surname,
+                Username = user.UserName,
+
+            };
+
+            return Ok();
         }
 
         [AllowAnonymous]

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TowTruckUberAPI.Models;
 
 namespace TowTruckUberAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210608165035_AddedMapGridToUser")]
+    partial class AddedMapGridToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,12 +205,7 @@ namespace TowTruckUberAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("MapGrids");
                 });
@@ -360,6 +357,9 @@ namespace TowTruckUberAPI.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("UserLocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -373,6 +373,8 @@ namespace TowTruckUberAPI.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("UserLocationId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -437,13 +439,6 @@ namespace TowTruckUberAPI.Migrations
                     b.Navigation("MapGrid");
                 });
 
-            modelBuilder.Entity("TowTruckUberAPI.Models.MapGrid", b =>
-                {
-                    b.HasOne("TowTruckUberAPI.Models.User", null)
-                        .WithMany("UserLocation")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("TowTruckUberAPI.Models.Payment", b =>
                 {
                     b.HasOne("TowTruckUberAPI.Models.User", "Payer")
@@ -486,6 +481,15 @@ namespace TowTruckUberAPI.Migrations
                     b.Navigation("StartLocation");
                 });
 
+            modelBuilder.Entity("TowTruckUberAPI.Models.User", b =>
+                {
+                    b.HasOne("TowTruckUberAPI.Models.MapGrid", "UserLocation")
+                        .WithMany()
+                        .HasForeignKey("UserLocationId");
+
+                    b.Navigation("UserLocation");
+                });
+
             modelBuilder.Entity("TowTruckUberAPI.Models.MapGrid", b =>
                 {
                     b.Navigation("Addresses");
@@ -496,8 +500,6 @@ namespace TowTruckUberAPI.Migrations
                     b.Navigation("ContractorTrips");
 
                     b.Navigation("CustomerTrips");
-
-                    b.Navigation("UserLocation");
                 });
 #pragma warning restore 612, 618
         }

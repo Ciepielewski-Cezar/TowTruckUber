@@ -13,9 +13,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace TowTruckUberAPI.Controllers
 {
-    [Authorize]
     [Route("payment")]
     [ApiController]
+    [AllowAnonymous]
     public class PaymentController : ControllerBase
     {
         private readonly AppDbContext _dbContext;

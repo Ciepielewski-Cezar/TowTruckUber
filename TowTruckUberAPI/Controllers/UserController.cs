@@ -27,7 +27,7 @@ namespace TowTruckUberAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    [AllowAnonymous]
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
@@ -70,7 +70,7 @@ namespace TowTruckUberAPI.Controllers
             return JsonSerializer.Serialize(mapGrid); ;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet]
         [Route("contractors")]
         public async Task<IActionResult> GetContractors()
@@ -125,7 +125,7 @@ namespace TowTruckUberAPI.Controllers
         }
 
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -160,7 +160,7 @@ namespace TowTruckUberAPI.Controllers
             return Ok(new Response { Status = "Success", Message = "User logout successfully." });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -246,7 +246,7 @@ namespace TowTruckUberAPI.Controllers
 
             return Ok(new Response { Status = "Success", Message = "User deleted successfully!" });
         }
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet]
         [Route("AccessDenied")]
         public IActionResult AccessDenied()

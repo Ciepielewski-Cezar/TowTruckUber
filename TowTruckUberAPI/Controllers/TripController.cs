@@ -15,7 +15,7 @@ using TowTruckUberAPI.Models.Dtos;
 
 namespace TowTruckUberAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [Route("trip")]
     [ApiController]
     public class TripController : ControllerBase
